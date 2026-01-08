@@ -9740,10 +9740,12 @@ aX8:function aX8(a){this.a=a},
 aX9:function aX9(a){this.a=a},
 aXa:function aXa(a){this.a=a},
 aXb:function aXb(a){this.a=a},
-aXc:function aXc(a){this.a=a},
+aXc:function aXc(a,b){this.a=a
+this.b=b},
 aX1:function aX1(a){this.a=a},
 aXd:function aXd(a){this.a=a},
-aXe:function aXe(a){this.a=a},
+aXe:function aXe(a,b){this.a=a
+this.b=b},
 aX0:function aX0(a){this.a=a},
 aX5:function aX5(){},
 yS:function yS(a,b,c,d,e,f,g,h,i){var _=this
@@ -57256,11 +57258,11 @@ h=t.p
 p=A.b([m,l,k,j,i,A.uh(n,B.PT,o===4,p,!1,!1,new A.aXa(f),"LA MIA LISTA")],h)
 if(!b){o=f.mI(8)
 n=!f.a.f||f.x
-p.push(A.uh(o,B.n1,!1,n,!1,!1,new A.aXb(a),"DOWNLOAD"))}p.push(A.k6(new A.aXc(f)))
+p.push(A.uh(o,B.n1,!1,n,!1,!1,new A.aXb(a),"DOWNLOAD"))}p.push(A.k6(new A.aXc(f,b)))
 p.push(B.cX)
 if(f.x||!f.a.f)B.b.K(p,A.b([B.Np,B.cX],h))
 p.push(A.k6(new A.aXd(f)))
-p.push(A.k6(new A.aXe(f)))
+p.push(A.k6(new A.aXe(f,b)))
 c=A.b([B.aT,c,B.i6,A.cS(A.oa(A.aP(p,B.p,e,B.m,B.n),e,B.V,B.Oe,e,B.a9),1,e)],h)
 if(f.x||!f.a.f)c.push(new A.bf(B.bT,A.b8u(new A.aX5(),A.BT(),t.A9),e))
 g=A.hw(!1,B.M,!0,e,A.je(A.ef(!1,e,A.aP(c,B.O,e,B.m,B.n),e,e,e,e,!0,e,new A.aX6(f),e,e,e,e),e,B.cH,new A.aH(d,e,e,e,q,e,B.v),B.ar,e,e,e,e,e,e,r),B.l,B.x,0,e,e,e,e,e,B.cm)
@@ -57311,8 +57313,8 @@ A.aXb.prototype={
 $0(){return A.dA(this.a).iR("/downloads",null,t.X)},
 $S:0}
 A.aXc.prototype={
-$3(a,b,c){var s=b.dH($.fe(),t.LC),r=this.a,q=r.a.d,p=r.mI(6),o=!r.a.f||r.x
-return A.uh(p,B.Q6,q===6,o,!1,!s.gUa(),new A.aX1(r),"PROFILO")},
+$3(a,b,c){var s=b.dH($.fe(),t.LC),r=this.a,q=r.a.d,p=r.mI(6),o=!r.a.f||r.x,n=!s.gUa()||this.b
+return A.uh(p,B.Q6,q===6,o,!1,n,new A.aX1(r),"PROFILO")},
 $C:"$3",
 $R:3,
 $S:676}
@@ -57327,7 +57329,7 @@ $R:3,
 $S:89}
 A.aXe.prototype={
 $3(a,b,c){var s,r
-if(!b.dH($.fe(),t.LC).gUa())return B.a6
+if(!b.dH($.fe(),t.LC).gUa()||this.b)return B.a6
 s=this.a
 r=s.mI(11)
 s=!s.a.f||s.x
