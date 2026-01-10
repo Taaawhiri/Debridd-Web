@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debridd - Pairing TV</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .session-code {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .session-code-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .session-code-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 4px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .message.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        .message.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Pairing TV</h1>
+        <p class="subtitle">Accedi per collegare la tua TV</p>
+        <div class="session-code">
+            <div class="session-code-label">Codice Sessione</div>
+            <div class="session-code-value" id="sessionCode">------</div>
+        </div>
+        <div id="message" class="message hidden"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email o Username</label>
+                <input type="text" id="email" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" id="submitBtn">
+                <span id="btnText">Accedi e Collega TV</span>
+                <span id="btnLoading" class="loading hidden"></span>
+            </button>
+        </form>
+    </div>
+    <script>
+        // CONFIGURAZIONE SUPABASE - SOSTITUISCI CON I TUOI VALORI
+        const SUPABASE_URL = 'yzqxdbaafsuervlqahwa';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cXhkYmFhZnN1ZXJ2bHFhaHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNzI5MDMsImV4cCI6MjA4Mjk0ODkwM30.UwoFUU1AzGFysWX9K7vZ_QhkJqq_jv_GaOLYw-X6H7o';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Estrai il session code dall'URL
+        const urlParams = new URLSearchParams(window.location.hash.substring(window.location.hash.indexOf('?')));
+        const pathParts = window.location.hash.split('/');
+        const sessionCode = pathParts[pathParts.length - 1].split('?')[0];
+        document.getElementById('sessionCode').textContent = sessionCode || '------';
+        if (!sessionCode || sessionCode === '------') {
+            showMessage('Codice sessione non valido', 'error');
+        }
+        // Gestione form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            setLoading(true);
+            hideMessage();
+            try {
+                // 1. Login con Supabase
+                let emailToUse = email;
+                
+                // Se non contiene @, prova a recuperare l'email tramite username
+                if (!email.includes('@')) {
+                    const { data, error } = await supabase.rpc('get_email_by_username', {
+                        username_input: email
+                    });
+                    
+                    if (error || !data) {
+                        throw new Error('Username non trovato');
+                    }
+                    emailToUse = data;
+                }
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: emailToUse,
+                    password: password
+                });
+                if (authError) throw authError;
+                // 2. Completa la sessione TV
+                const { data: sessionData, error: sessionError } = await supabase.rpc('complete_tv_session', {
+                    p_session_code: sessionCode,
+                    p_access_token: authData.session.access_token,
+                    p_refresh_token: authData.session.refresh_token
+                });
+                if (sessionError) throw sessionError;
+                // 3. Successo!
+                showMessage('✅ TV collegata con successo! Puoi chiudere questa pagina.', 'success');
+                document.getElementById('loginForm').classList.add('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('❌ ' + (error.message || 'Errore durante il login'), 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+        function setLoading(loading) {
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            btn.disabled = loading;
+            btnText.classList.toggle('hidden', loading);
+            btnLoading.classList.toggle('hidden', !loading);
+        }
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+        function hideMessage() {
+            document.getElementById('message').className = 'message hidden';
+        }
+    </script>
+</body>
+</html>
